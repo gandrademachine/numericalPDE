@@ -117,7 +117,7 @@ def viscose(array,index,dx,dt,mi):
     return dt*mi*(array[index+1]-array[index])/dx**2
 def nonviscose(array,index,dx,dt,mi):
     alpha = max(abs(array[index+1]),abs(array[index]))
-    return -alpha*(array[index+1]-array[index])
+    return 0.5*(dt/dx)*alpha*(array[index+1]-array[index])
 def nonlinear_slope(array,index,dx,dt,mi,method):
     if method ==  'viscose':
         return viscose(array,index,dx,dt,mi)
@@ -139,7 +139,7 @@ def Godunov_nonlinear(mi,dx,dt,tf,method):
         ICArray[-1] = ICArray[1]
         plt.clf()
         for j in range(1,sstp-1):
-             temp[j] =  ICArray[j]-0.25*dt*(ICArray[j+1]**2-ICArray[j-1]**2)+(nonlinear_slope(ICArray,j,dx,dt,mi,method)-nonlinear_slope(ICArray,j-1,dx,dt,mi,method))
+             temp[j] =  ICArray[j]-0.25*dt*(ICArray[j+1]**2-ICArray[j-1]**2)/dx+(nonlinear_slope(ICArray,j,dx,dt,mi,method)-nonlinear_slope(ICArray,j-1,dx,dt,mi,method))
         ICArray = temp
         t0 +=dt
         plt.plot(x,ICArray,'bo-')
@@ -148,4 +148,4 @@ def Godunov_nonlinear(mi,dx,dt,tf,method):
         plt.axis([0,1,-1,2])
         plt.pause(0.001)
 # Godunov(u=1.0,dx=0.01,dt=0.008,tf=2,method='VanLeer')    
-Godunov_nonlinear(mi=0.005,dx=0.01,dt=0.001,tf=2,method='nonviscose')  
+Godunov_nonlinear(mi=1.0,dx=0.01,dt=0.01,tf=2,method='viscose')  
